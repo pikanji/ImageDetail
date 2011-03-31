@@ -4,26 +4,33 @@ package net.pikanji.imagedetail;
 import java.io.IOException;
 
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.provider.MediaStore.Images.Thumbnails;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 public class ImageDetail extends Activity implements OnClickListener {
     private static final String DEBUG_TAG = "ImageDetail";
     private static final int REQUEST_PICK_IMAGE = 531;
     private final String mNewLine;
+    private String mInfo = "";
+    private Bitmap mThumbnail;
 
     // インテントからの情報の格納先を準備する
-    private String[] projection = {
+    private static final String[] projection = {
             MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME,
             MediaStore.Images.ImageColumns.BUCKET_ID, MediaStore.Images.ImageColumns.DATE_TAKEN,
             MediaStore.Images.ImageColumns.DESCRIPTION, MediaStore.Images.ImageColumns.IS_PRIVATE,
@@ -34,6 +41,8 @@ public class ImageDetail extends Activity implements OnClickListener {
             MediaStore.Images.ImageColumns.DATE_MODIFIED,
             MediaStore.Images.ImageColumns.DISPLAY_NAME, MediaStore.Images.ImageColumns.MIME_TYPE,
             MediaStore.Images.ImageColumns.SIZE, MediaStore.Images.ImageColumns.TITLE,
+            MediaStore.Images.ImageColumns._ID,
+    // MediaStore.Images.ImageColumns._COUNT,
     };
 
     public ImageDetail() {
@@ -58,6 +67,16 @@ public class ImageDetail extends Activity implements OnClickListener {
     }
 
     @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        TextView textView = (TextView) findViewById(R.id.text_info);
+        textView.setText(mInfo);
+
+        ImageView imageView = (ImageView) findViewById(R.id.image_view);
+        imageView.setImageBitmap(mThumbnail);
+        super.onConfigurationChanged(newConfig);
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (REQUEST_PICK_IMAGE != requestCode) {
             return;
@@ -69,11 +88,28 @@ public class ImageDetail extends Activity implements OnClickListener {
 
         Uri uri = data.getData();
         Cursor cursor = this.managedQuery(uri, projection, null, null, null);
+        mInfo = getInfoFromDatabase(cursor);
 
+        String filepath = cursor.getString(10);
+        mInfo += getInfoFromExif(filepath);
+
+        TextView textView = (TextView) findViewById(R.id.text_info);
+        textView.setText(mInfo);
+
+        long imageId = cursor.getLong(17);
+        ContentResolver cr = getContentResolver();
+        mThumbnail = MediaStore.Images.Thumbnails.getThumbnail(cr, imageId, Thumbnails.MINI_KIND,
+                null);
+        ImageView imageView = (ImageView) findViewById(R.id.image_view);
+        imageView.setImageBitmap(mThumbnail);
+    }
+
+    private String getInfoFromDatabase(Cursor cursor) {
+        String info = "";
         if ((null == cursor) || !cursor.moveToFirst()) {
-            return;
+            return info;
         }
-        String info = "-- DB ----" + mNewLine;
+        info += "-- DB ----" + mNewLine;
         info += "bucket display name: " + cursor.getString(0) + mNewLine;
         info += "bucket ID: " + cursor.getString(1) + mNewLine;
         info += "date taken: " + formatDate(cursor.getLong(2)) + mNewLine;
@@ -84,22 +120,29 @@ public class ImageDetail extends Activity implements OnClickListener {
         info += "mini thumb magic: " + cursor.getInt(7) + mNewLine;
         info += "orientation: " + cursor.getInt(8) + mNewLine;
         info += "picasa ID: " + cursor.getString(9) + mNewLine;
-        String filepath = cursor.getString(10);
-        info += "file path: " + filepath + mNewLine;
+
+        info += "file path: " + cursor.getString(10) + mNewLine;
         info += "data added: " + formatDate(cursor.getLong(11)) + mNewLine;
         info += "data modified: " + formatDate(cursor.getLong(12)) + mNewLine;
         info += "display name: " + cursor.getString(13) + mNewLine;
         info += "mime_type: " + cursor.getString(14) + mNewLine;
         info += "size: " + cursor.getInt(15) / 1024 + "KB" + mNewLine;
         info += "title: " + cursor.getString(16) + mNewLine;
-        info += mNewLine;
 
+        info += "id: " + cursor.getLong(17) + mNewLine;
+        // info += "row count: " + cursor.getString(18) + mNewLine;
+        info += mNewLine;
+        return info;
+    }
+
+    private String getInfoFromExif(String filepath) {
+        String info = "";
         ExifInterface exif;
         try {
             exif = new ExifInterface(filepath);
         } catch (IOException e) {
             Log.e(DEBUG_TAG, "ExifInterface caused exeption.");
-            return;
+            return info;
         }
 
         info += "-- exif ----" + mNewLine;
@@ -116,9 +159,7 @@ public class ImageDetail extends Activity implements OnClickListener {
         info += "model: " + exif.getAttribute(ExifInterface.TAG_MODEL) + mNewLine;
         info += "orientation: " + exif.getAttribute(ExifInterface.TAG_ORIENTATION) + mNewLine;
         info += "whiteBalance: " + exif.getAttribute(ExifInterface.TAG_WHITE_BALANCE);
-
-        TextView textView = (TextView) findViewById(R.id.text_info);
-        textView.setText(info);
+        return info;
     }
 
     private String formatDate(long dateMillis) {

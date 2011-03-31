@@ -8,11 +8,22 @@
         android:layout_height="wrap_content"
         android:layout_width="fill_parent"
         android:layout_weight="1" >
-        <TextView
-            android:text=""
-            android:id="@+id/text_info"
+        <LinearLayout
+            android:orientation="vertical"
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent" />
+            android:layout_height="fill_parent" >
+            <ImageView
+                android:id="@+id/image_view"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="0" />
+            <TextView
+                android:text=""
+                android:id="@+id/text_info"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+        </LinearLayout>
     </ScrollView>
     <Button
         android:text="select picture"
