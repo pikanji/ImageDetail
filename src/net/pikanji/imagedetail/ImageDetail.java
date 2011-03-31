@@ -11,6 +11,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.media.ExifInterface;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Images.Thumbnails;
@@ -146,19 +147,37 @@ public class ImageDetail extends Activity implements OnClickListener {
         }
 
         info += "-- exif ----" + mNewLine;
-        info += "datetime: " + exif.getAttribute(ExifInterface.TAG_DATETIME) + mNewLine;
+        // 2.1
+        info += "date time: " + exif.getAttribute(ExifInterface.TAG_DATETIME) + mNewLine;
         info += "flash: " + exif.getAttribute(ExifInterface.TAG_FLASH) + mNewLine;
-        info += "latitude: " + exif.getAttribute(ExifInterface.TAG_GPS_LATITUDE) + mNewLine;
-        info += "latitudeRef: " + exif.getAttribute(ExifInterface.TAG_GPS_LATITUDE_REF) + mNewLine;
-        info += "longitude: " + exif.getAttribute(ExifInterface.TAG_GPS_LONGITUDE) + mNewLine;
-        info += "longitudeRef: " + exif.getAttribute(ExifInterface.TAG_GPS_LONGITUDE_REF)
+        info += "GPS latitude: " + exif.getAttribute(ExifInterface.TAG_GPS_LATITUDE) + mNewLine;
+        info += "GPS latitude ref: " + exif.getAttribute(ExifInterface.TAG_GPS_LATITUDE_REF)
                 + mNewLine;
-        info += "imageLength: " + exif.getAttribute(ExifInterface.TAG_IMAGE_LENGTH) + mNewLine;
-        info += "imageWidth: " + exif.getAttribute(ExifInterface.TAG_IMAGE_WIDTH) + mNewLine;
+        info += "GPS longitude: " + exif.getAttribute(ExifInterface.TAG_GPS_LONGITUDE) + mNewLine;
+        info += "GPS longitude ref: " + exif.getAttribute(ExifInterface.TAG_GPS_LONGITUDE_REF)
+                + mNewLine;
+        info += "image length: " + exif.getAttribute(ExifInterface.TAG_IMAGE_LENGTH) + mNewLine;
+        info += "image width: " + exif.getAttribute(ExifInterface.TAG_IMAGE_WIDTH) + mNewLine;
         info += "make: " + exif.getAttribute(ExifInterface.TAG_MAKE) + mNewLine;
         info += "model: " + exif.getAttribute(ExifInterface.TAG_MODEL) + mNewLine;
         info += "orientation: " + exif.getAttribute(ExifInterface.TAG_ORIENTATION) + mNewLine;
-        info += "whiteBalance: " + exif.getAttribute(ExifInterface.TAG_WHITE_BALANCE);
+        info += "white balance: " + exif.getAttribute(ExifInterface.TAG_WHITE_BALANCE);
+        switch (Build.VERSION.SDK_INT) {
+            case Build.VERSION_CODES.HONEYCOMB: // 3.0
+                info += "aperture: " + exif.getAttribute(ExifInterface.TAG_APERTURE);
+                info += "exposure time: " + exif.getAttribute(ExifInterface.TAG_EXPOSURE_TIME);
+                info += "ISO: " + exif.getAttribute(ExifInterface.TAG_ISO);
+            case Build.VERSION_CODES.GINGERBREAD: // 2.3.1
+                info += "GPS altitude: " + exif.getAttribute(ExifInterface.TAG_GPS_ALTITUDE);
+                info += "GPS altitude ref: "
+                        + exif.getAttribute(ExifInterface.TAG_GPS_ALTITUDE_REF);
+            case Build.VERSION_CODES.FROYO: // 2.2
+                info += "focal length: " + exif.getAttribute(ExifInterface.TAG_FOCAL_LENGTH);
+                info += "GPS date stamp: " + exif.getAttribute(ExifInterface.TAG_GPS_DATESTAMP);
+                info += "GPS proccessing method: "
+                        + exif.getAttribute(ExifInterface.TAG_GPS_PROCESSING_METHOD);
+                info += "GPS time stamp: " + exif.getAttribute(ExifInterface.TAG_GPS_TIMESTAMP);
+        }
         return info;
     }
 
