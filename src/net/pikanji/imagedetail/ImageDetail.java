@@ -161,22 +161,27 @@ public class ImageDetail extends Activity implements OnClickListener {
         info += "make: " + exif.getAttribute(ExifInterface.TAG_MAKE) + mNewLine;
         info += "model: " + exif.getAttribute(ExifInterface.TAG_MODEL) + mNewLine;
         info += "orientation: " + exif.getAttribute(ExifInterface.TAG_ORIENTATION) + mNewLine;
-        info += "white balance: " + exif.getAttribute(ExifInterface.TAG_WHITE_BALANCE);
+        info += "white balance: " + exif.getAttribute(ExifInterface.TAG_WHITE_BALANCE) + mNewLine;
         switch (Build.VERSION.SDK_INT) {
             case Build.VERSION_CODES.HONEYCOMB: // 3.0
-                info += "aperture: " + exif.getAttribute(ExifInterface.TAG_APERTURE);
-                info += "exposure time: " + exif.getAttribute(ExifInterface.TAG_EXPOSURE_TIME);
-                info += "ISO: " + exif.getAttribute(ExifInterface.TAG_ISO);
+                info += "aperture: " + exif.getAttribute(ExifInterface.TAG_APERTURE) + mNewLine;
+                info += "exposure time: " + exif.getAttribute(ExifInterface.TAG_EXPOSURE_TIME)
+                        + mNewLine;
+                info += "ISO: " + exif.getAttribute(ExifInterface.TAG_ISO) + mNewLine;
             case Build.VERSION_CODES.GINGERBREAD: // 2.3.1
-                info += "GPS altitude: " + exif.getAttribute(ExifInterface.TAG_GPS_ALTITUDE);
+                info += "GPS altitude: " + exif.getAttribute(ExifInterface.TAG_GPS_ALTITUDE)
+                        + mNewLine;
                 info += "GPS altitude ref: "
-                        + exif.getAttribute(ExifInterface.TAG_GPS_ALTITUDE_REF);
+                        + exif.getAttribute(ExifInterface.TAG_GPS_ALTITUDE_REF) + mNewLine;
             case Build.VERSION_CODES.FROYO: // 2.2
-                info += "focal length: " + exif.getAttribute(ExifInterface.TAG_FOCAL_LENGTH);
-                info += "GPS date stamp: " + exif.getAttribute(ExifInterface.TAG_GPS_DATESTAMP);
+                info += "focal length: " + exif.getAttribute(ExifInterface.TAG_FOCAL_LENGTH)
+                        + mNewLine;
+                info += "GPS date stamp: " + exif.getAttribute(ExifInterface.TAG_GPS_DATESTAMP)
+                        + mNewLine;
                 info += "GPS proccessing method: "
-                        + exif.getAttribute(ExifInterface.TAG_GPS_PROCESSING_METHOD);
-                info += "GPS time stamp: " + exif.getAttribute(ExifInterface.TAG_GPS_TIMESTAMP);
+                        + exif.getAttribute(ExifInterface.TAG_GPS_PROCESSING_METHOD) + mNewLine;
+                info += "GPS time stamp: " + exif.getAttribute(ExifInterface.TAG_GPS_TIMESTAMP)
+                        + mNewLine;
         }
         return info;
     }
